@@ -2,6 +2,7 @@ from fastapi import FastAPI, File, UploadFile
 from .utils import hash_image
 from .cache import get_cached_prediction, set_cached_prediction
 from .models.animal_classifier import classify_animal
+from .models.breed_captioner import generate_caption  # Make sure this import is present
 import json
 
 app = FastAPI()
@@ -16,7 +17,12 @@ async def predict(file: UploadFile = File(...)):
         return {"result": json.loads(cached), "source": "cache"}
 
     category = classify_animal(image_bytes)
-    result = {"category": category}
+    description = generate_caption(image_bytes)
+
+    result = {
+        "category": category,
+        "description": description
+    }
 
     set_cached_prediction(hash_key, json.dumps(result))
     return {"result": result, "source": "model"}

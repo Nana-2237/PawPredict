@@ -1,8 +1,10 @@
 fastapi
 uvicorn
-pillow
+Pillow
 tensorflow
 numpy
 redis
 python-dotenv
 python-multipart
+torch
+transformers
