@@ -2,7 +2,7 @@ from fastapi import FastAPI, File, UploadFile
 from .utils import hash_image
 from .cache import get_cached_prediction, set_cached_prediction
 from .models.animal_classifier import classify_animal
-from .models.breed_captioner import generate_caption  # Make sure this import is present
+from .models.breed_captioner import generate_caption 
 import json
 
 app = FastAPI()

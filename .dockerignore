@@ -4,5 +4,28 @@ __pycache__/
 *.pyd
 *.db
 *.sqlite3
+*.log
+
+.dockerignore
+.docker-compose.override.yml
+.docker-compose.prod.yml
+
 .env
-*.h5
+*.env
+.env.*
+
+.git/
+.gitignore
+
+# Optional: Hugging Face model cache
+.cache/
+huggingface/
+
+# Optional: VSCode + OS clutter
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Optional: frontend not needed in backend build
+frontend/
