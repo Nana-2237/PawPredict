@@ -1,11 +1,14 @@
-import React, { useState } from 'react';
-import '../src/index.css';
+import React, { useState, useEffect } from 'react';
 import pawIcon from './assets/paw.png';
+import catIcon from './assets/walkingcat.png';
+import './index.css';
 
 function App() {
   const [image, setImage] = useState(null);
   const [result, setResult] = useState(null);
   const [source, setSource] = useState(null);
+  const [catPos, setCatPos] = useState({ top: 100, left: 100 });
+  const [pawTrail, setPawTrail] = useState([]);
 
   const handleFileChange = (event) => {
     const file = event.target.files[0];
@@ -24,50 +27,65 @@ function App() {
       });
 
       const data = await response.json();
-      console.log('Backend full response:', data);
-
-      // Unwrap the `result` object from the response
       setResult({
         animal: data.result.category,
         description: data.result.description,
       });
-
       setSource(data.source);
     } catch (error) {
       console.error('Prediction failed:', error);
     }
   };
 
-  const scatteredPaws = [
-    { top: '5%', left: '10%' },
-    { top: '15%', right: '8%' },
-    { bottom: '10%', left: '6%' },
-    { bottom: '12%', right: '10%' },
-    { top: '30%', left: '4%' },
-    { bottom: '30%', right: '4%' },
-  ];
+  // Move cat randomly and leave paw prints
+  useEffect(() => {
+    const moveCat = () => {
+      const maxX = window.innerWidth - 100;
+      const maxY = window.innerHeight - 100;
+
+      const newTop = Math.random() * maxY;
+      const newLeft = Math.random() * maxX;
+
+      // Leave a paw at the current position before moving
+      setPawTrail((prev) => [...prev, { top: catPos.top + 20, left: catPos.left + 20 }]);
+
+      setCatPos({ top: newTop, left: newLeft });
+    };
+
+    const interval = setInterval(moveCat, 3000); // every 3s
+    return () => clearInterval(interval);
+  }, [catPos]);
 
   return (
-    <div className="relative flex flex-col items-center justify-center min-h-screen bg-gradient-to-b from-orange-50 to-white p-10 overflow-hidden">
-      {/* Scattered Paw Icons */}
-      {scatteredPaws.map((pos, i) => (
+    <div className="relative flex flex-col items-center justify-center min-h-screen bg-gradient-to-b from-orange-50 to-white p-10 overflow-hidden z-10">
+
+      {/* Paw Prints */}
+      {pawTrail.map((pos, idx) => (
         <img
-          key={i}
+          key={idx}
           src={pawIcon}
           alt="paw"
-          className="w-8 h-8 absolute opacity-10"
-          style={pos}
+          className="w-6 h-6 absolute opacity-20 pointer-events-none"
+          style={{ top: `${pos.top}px`, left: `${pos.left}px` }}
         />
       ))}
 
+      {/* Walking Cat */}
+      <img
+        src={catIcon}
+        alt="walking cat"
+        className="absolute w-20 transition-all duration-1000 ease-in-out pointer-events-none"
+        style={{ top: `${catPos.top}px`, left: `${catPos.left}px` }}
+      />
+
       {/* Logo */}
-      <h1 className="text-4xl font-bold text-orange-500 mb-10 flex items-center gap-2">
+      <h1 className="text-4xl font-bold text-orange-500 mb-10 flex items-center gap-2 z-10">
         <img src={pawIcon} alt="paw" className="w-6 h-6" />
         PawPredict
       </h1>
 
       {/* Upload Box */}
-      <div className="bg-white rounded-3xl shadow-xl p-8 max-w-md w-full text-center space-y-6">
+      <div className="bg-white rounded-3xl shadow-xl p-8 max-w-md w-full text-center space-y-6 z-10">
         <label
           htmlFor="file-upload"
           className="block border-2 border-dashed border-orange-300 rounded-xl p-8 cursor-pointer text-gray-600"
@@ -92,7 +110,7 @@ function App() {
 
       {/* Result Box */}
       {result && (
-        <div className="bg-white rounded-2xl shadow-lg p-6 mt-8 max-w-md w-full text-left">
+        <div className="bg-white rounded-2xl shadow-lg p-6 mt-8 max-w-md w-full text-left z-10">
           <p className="text-lg font-semibold">
             <strong>Animal:</strong> {result.animal}
           </p>
