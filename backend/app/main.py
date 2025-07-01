@@ -1,4 +1,6 @@
 from fastapi import FastAPI, File, UploadFile
+from fastapi.middleware.cors import CORSMiddleware 
+
 from .utils import hash_image
 from .cache import get_cached_prediction, set_cached_prediction
 from .models.animal_classifier import classify_animal
@@ -6,6 +8,14 @@ from .models.breed_captioner import generate_caption
 import json
 
 app = FastAPI()
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:3000"],  # React dev server URL
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 @app.post("/predict")
 async def predict(file: UploadFile = File(...)):
